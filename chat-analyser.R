@@ -6,7 +6,7 @@ library(tidyverse)
 library(plotly)
 library(lubridate)
 
-file_name <- '<<path_to_file>>/chat.txt'
+file_name <- '/home/cksidharthan/Documents/Programming/R Programming/whatsapp-chat-analysis/bias_chat.txt'
 chat_tbl <- rwa_read(file_name)
 
 # Data Cleaning
@@ -25,7 +25,7 @@ msg_over_time %>% layout(title = "Number of Messages Over time",
                         xaxis = list(title = "Date"), yaxis = list (title = "Number of Messages"))
 
 hrs_msg_tbl <- chat_tbl %>% select(hours) %>% group_by(hours) %>% mutate(count = n()) %>% sort(hours, decreasing = F)
-plot_ly(x = ~hrs_msg_tbl$hours, y = ~hrs_msg_tbl$count, mode = 'lines') %>%
+plot_ly(x = ~hrs_msg_tbl$hours, y = ~hrs_msg_tbl$count, type = 'bar') %>%
   layout(title = "Number of Messages Over time", xaxis = list(title = "Date"), yaxis = list (title = "Number of Messages"))
 
 # Graph 2 - Messages During days of Week
@@ -96,7 +96,7 @@ name_corpus_cleaned <- tm_map(name_corpus, removePunctuation)
 name_corpus_cleaned <- tm_map(name_corpus_cleaned, tolower)
 name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeNumbers)
 # Add words to below line to remove the words from the corpus
-name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeWords, c("words", "to", 'remove'))
+name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeWords, c("bias", "ucc", 'crb'))
 name_matrix <- TermDocumentMatrix(name_corpus_cleaned)
 name_matrix <- as.matrix(name_matrix)
 name_count <- rowSums(name_matrix)
@@ -105,3 +105,8 @@ wordcloud(words = names(name_count), freq = name_count, max.words = 50, random.o
           colors = brewer.pal(8, "Dark2"), scale = c(4,2), rot.per = 0.2)
 
 barplot(name_count, las = 2, col = rainbow(10), ylab = "Count", main = "Number of Messages by Users")
+
+# Need to add
+# Number of people removed from group
+# Number of people added group
+# Number of Emojis
