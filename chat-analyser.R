@@ -6,7 +6,7 @@ library(tidyverse)
 library(plotly)
 library(lubridate)
 
-file_name <- '/home/cksidharthan/Documents/Programming/R Programming/whatsapp-chat-analysis/bias_chat.txt'
+file_name <- '<<path_to_file>>/chat.txt'
 chat_tbl <- rwa_read(file_name)
 
 # Data Cleaning
@@ -60,6 +60,7 @@ library(wordcloud)
 library(wordcloud2)
 library(syuzhet)
 library(tm)
+library(RColorBrewer)
 
 text_corpus <- iconv(chat_tbl$text, to = "utf-8")
 text_corpus <- Corpus(VectorSource(text_corpus))
@@ -89,20 +90,17 @@ colSums(chat_sentiment)
 barplot(colSums(chat_sentiment), las = 2, col = rainbow(10), ylab = "Count", main = "Sentiment Scores for Chat")
 
 # Wordcloud - Messages by users
-name_corpus <- iconv(chat_tbl$author, to = "utf-8")
-name_corpus <- Corpus(VectorSource(name_corpus))
-name_corpus_cleaned <- tm_map(name_corpus, stripWhitespace)
-name_corpus_cleaned <- tm_map(name_corpus, removePunctuation)
-name_corpus_cleaned <- tm_map(name_corpus_cleaned, tolower)
-name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeNumbers)
-# Add words to below line to remove the words from the corpus
-name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeWords, c("bias", "ucc", 'crb'))
-name_matrix <- TermDocumentMatrix(name_corpus_cleaned)
-name_matrix <- as.matrix(name_matrix)
-name_count <- rowSums(name_matrix)
+author <- chat_tbl %>% count(author, sort = T)
 
-wordcloud(words = names(name_count), freq = name_count, max.words = 50, random.order = F, min.freq = 40,
-          colors = brewer.pal(8, "Dark2"), scale = c(4,2), rot.per = 0.2)
+author %>% ggplot(aes(x = reorder(author, n), y = n)) +
+  geom_bar(stat = "identity", fill = "lightblue") +
+  ylab("") + xlab("") +
+  coord_flip() +
+  ggtitle("Number of messages")
+
+# wordcloud2(author, size = 0.5)
+wordcloud(words = author$author, freq = author$n, max.words = 100, random.order = T, min.freq = 10,
+          colors = brewer.pal(8, "Dark2"), scale = c(4,2), rot.per = 0.3)
 
 barplot(name_count, las = 2, col = rainbow(10), ylab = "Count", main = "Number of Messages by Users")
 
