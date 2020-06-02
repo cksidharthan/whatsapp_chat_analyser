@@ -6,7 +6,7 @@ library(tidyverse)
 library(plotly)
 library(lubridate)
 
-file_name <- '/home/cksidharthan/Documents/Programming/R Programming/whatsapp-chat-analysis/bias_chat.txt'
+file_name <- '<<path_to_file>>/chat.txt'
 chat_tbl <- rwa_read(file_name)
 
 # Data Cleaning
@@ -21,10 +21,12 @@ chat_tbl$month <- month.abb[month(as.Date(chat_tbl$`dates`))]
 date_msg_count_tbl <- chat_tbl %>% select(time) %>% group_by(time) %>% mutate(count = n())
 date_msg_count_tbl <- date_msg_count_tbl[order(date_msg_count_tbl$time),]
 msg_over_time <- plot_ly(x = ~date_msg_count_tbl$time, y = ~date_msg_count_tbl$count, mode = 'lines', type = 'scatter')
-msg_over_time <- msg_over_time %>% layout(title = "Number of Messages Over time",
-                                          xaxis = list(title = "Date"),
-                                          yaxis = list (title = "Number of Messages"))
-msg_over_time
+msg_over_time %>% layout(title = "Number of Messages Over time",
+                        xaxis = list(title = "Date"), yaxis = list (title = "Number of Messages"))
+
+hrs_msg_tbl <- chat_tbl %>% select(hours) %>% group_by(hours) %>% mutate(count = n()) %>% sort(hours, decreasing = F)
+plot_ly(x = ~hrs_msg_tbl$hours, y = ~hrs_msg_tbl$count, mode = 'lines') %>%
+  layout(title = "Number of Messages Over time", xaxis = list(title = "Date"), yaxis = list (title = "Number of Messages"))
 
 # Graph 2 - Messages During days of Week
 library(viridis)
@@ -94,7 +96,7 @@ name_corpus_cleaned <- tm_map(name_corpus, removePunctuation)
 name_corpus_cleaned <- tm_map(name_corpus_cleaned, tolower)
 name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeNumbers)
 # Add words to below line to remove the words from the corpus
-name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeWords, c("bias", "ucc", 'crb'))
+name_corpus_cleaned <- tm_map(name_corpus_cleaned, removeWords, c("words", "to", 'remove'))
 name_matrix <- TermDocumentMatrix(name_corpus_cleaned)
 name_matrix <- as.matrix(name_matrix)
 name_count <- rowSums(name_matrix)
